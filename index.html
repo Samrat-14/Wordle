@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Wordle - but a better one ;)"
+    />
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+    <script src="script.js" defer></script>
+    <title>Wordle</title>
+</head>
+<body>
+    <header>
+        <div class="icon icon-helper" id="help">
+            <i class="uil uil-question-circle"></i>
+        </div>
+        Wordle
+        <div class="icon icon-helper" id="statistics">
+            <i class="uil uil-graph-bar"></i>
+        </div>
+    </header>
+
+    <div data-modal-help class="modal active">
+        <div class="box">
+            <div class="icon icon-close">
+                <i class="uil uil-times" id="help-close"></i>
+            </div>
+            <h3>HOW TO PLAY</h3>
+
+            <div class="help-container">
+                <div class="instructions">Guess the <b>WORDLE</b> in six tries.</div>
+                <div class="instructions">Each guess must be a valid five-letter word. Hit the enter button to submit.</div>
+                <div class="instructions">After each guess, the color of the tiles will change to show how close your guess was to the word.</div>
+                <hr>
+                <div class="example">
+                    <h3>Examples</h3>
+                    <div class="block">
+                        <div class="tile" data-state="correct">S</div>
+                        <div class="tile">M</div>
+                        <div class="tile">A</div>
+                        <div class="tile">R</div>
+                        <div class="tile">T</div>
+                    </div>
+                    <div class="instructions">The letter <b>S</b> is in the word and in the correct spot.</div>
+                    <div class="block">
+                        <div class="tile">W</div>
+                        <div class="tile" data-state="wrong-location">H</div>
+                        <div class="tile">E</div>
+                        <div class="tile">A</div>
+                        <div class="tile">T</div>
+                    </div>
+                    <div class="instructions">The letter <b>H</b> is in the word but in the wrong spot.</div>
+                    <div class="block">
+                        <div class="tile">N</div>
+                        <div class="tile">O</div>
+                        <div class="tile">I</div>
+                        <div class="tile" data-state="wrong">S</div>
+                        <div class="tile">E</div>
+                    </div>
+                    <div class="instructions">The letter <b>S</b> is not in the word in any spot.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert-container" data-alert-container></div>
+
+    <div data-guess-grid class="guess-grid">
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+        <div class="tile"></div>
+    </div>
+
+    <div data-keyboard class="keyboard">
+        <button class="key" data-key="Q">Q</button>
+        <button class="key" data-key="W">W</button>
+        <button class="key" data-key="E">E</button>
+        <button class="key" data-key="R">R</button>
+        <button class="key" data-key="T">T</button>
+        <button class="key" data-key="Y">Y</button>
+        <button class="key" data-key="U">U</button>
+        <button class="key" data-key="I">I</button>
+        <button class="key" data-key="O">O</button>
+        <button class="key" data-key="P">P</button>
+        <div class="space"></div>
+        <button class="key" data-key="A">A</button>
+        <button class="key" data-key="S">S</button>
+        <button class="key" data-key="D">D</button>
+        <button class="key" data-key="F">F</button>
+        <button class="key" data-key="G">G</button>
+        <button class="key" data-key="H">H</button>
+        <button class="key" data-key="J">J</button>
+        <button class="key" data-key="K">K</button>
+        <button class="key" data-key="L">L</button>
+        <div class="space"></div>
+        <button class="key large" data-enter>Enter</button>
+        <button class="key" data-key="Z">Z</button>
+        <button class="key" data-key="X">X</button>
+        <button class="key" data-key="C">C</button>
+        <button class="key" data-key="V">V</button>
+        <button class="key" data-key="B">B</button>
+        <button class="key" data-key="N">N</button>
+        <button class="key" data-key="M">M</button>
+        <button class="key large" data-delete>
+            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+                <path fill="var(--color-tone-1)" d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H7.07L2.4 12l4.66-7H22v14zm-11.59-2L14 13.41 17.59 17 19 15.59 15.41 12 19 8.41 17.59 7 14 10.59 10.41 7 9 8.41 12.59 12 9 15.59z"></path>
+              </svg>
+        </button>
+    </div>
+
+    <div data-modal class="modal">
+        <div class="box">
+            <div class="icon icon-close">
+                <i class="uil uil-times" id="modal-close"></i>
+            </div>
+            <h3>STATISTICS</h3>
+            <div class="stats-wrapper">
+                <div class="stats-container">
+                    <span class="stats-number" id="stats-played">0</span>
+                    <span class="stats-name">Played</span>
+                </div>
+                <div class="stats-container">
+                    <span class="stats-number" id="stats-winrate">0</span>
+                    <span class="stats-name">Win %</span>
+                </div>
+                <div class="stats-container">
+                    <span class="stats-number" id="stats-currentstreak">0</span>
+                    <span class="stats-name"> Current Streak</span>
+                </div>
+                <div class="stats-container">
+                    <span class="stats-number" id="stats-maxstreak">0</span>
+                    <span class="stats-name">Max Streak</span>
+                </div>
+            </div>
+
+            <h3>GUESS DISTRIBUTION</h3>
+            <div class="guess-dis-wrapper">
+                <div class="guess-dis-container">
+                    1 <div data-bar class="guess-dis-bar" id="barOne">0</div>
+                </div>
+                <div class="guess-dis-container">
+                    2 <div data-bar class="guess-dis-bar" id="barTwo">0</div>
+                </div>
+                <div class="guess-dis-container">
+                    3 <div data-bar class="guess-dis-bar" id="barThree">0</div>
+                </div>
+                <div class="guess-dis-container">
+                    4 <div data-bar class="guess-dis-bar" id="barFour">0</div>
+                </div>
+                <div class="guess-dis-container">
+                    5 <div data-bar class="guess-dis-bar" id="barFive">0</div>
+                </div>
+                <div class="guess-dis-container">
+                    6 <div data-bar class="guess-dis-bar" id="barSix">0</div>
+                </div>
+            </div>
+
+            <div class="buttons">
+                <div class="button disabled" id="try-again">Try Again</div>
+                <div class="button disabled" id="next">Next</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
