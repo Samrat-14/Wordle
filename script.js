@@ -15377,7 +15377,7 @@ statistics.addEventListener('click', () => {
     stopInteraction();
 })
 
-
+updateStats(-1);
 startInteraction();
 
 function startInteraction() {
@@ -15554,7 +15554,7 @@ function checkWinLose(guess, tiles) {
 
         danceTiles(tiles);
         statsPlayed += 1;
-        updateStats(true);
+        updateStats(1);
         setTimeout(() => {
             modal.classList.add('active');
             tryAgainButton.classList.add('disabled');
@@ -15575,7 +15575,7 @@ function checkWinLose(guess, tiles) {
         statsPlayed += 1;
         statsLost += 1;
         localStorage.setItem("statsLost", statsLost);
-        updateStats(false);
+        updateStats(0);
         setTimeout(() => {
             modal.classList.add('active');
             nextButton.classList.add('disabled');
@@ -15589,9 +15589,9 @@ function checkWinLose(guess, tiles) {
 }
 
 function updateStats(won){
-    statsWinRate = Math.floor((statsPlayed - statsLost) / statsPlayed * 100);
-    if(won) statsCurrentStreak += 1;
-    else statsCurrentStreak = 0;
+    statsWinRate = Math.floor((statsPlayed - statsLost) / statsPlayed * 100) || 0;
+    if(won === 1) statsCurrentStreak += 1;
+    else if(won === 0) statsCurrentStreak = 0;
     if(statsCurrentStreak >= statsMaxStreak) statsMaxStreak = statsCurrentStreak;
 
     statsPlayedSpan.innerText = statsPlayed;
@@ -15612,8 +15612,8 @@ function updateStats(won){
 
     statsBars.forEach((bar, barInd) => {
         if(statsBar[barInd] > 0) {
-            bar.classList.add('bar-green');
             bar.style.width = `${(statsBar[barInd] / statsBarMax) * 234}px`;
+            bar.style.backgroundColor = `hsl(${(statsBar[barInd] / statsBarMax) * 125}, 29%, 43%)`;
         }
     });
 }
