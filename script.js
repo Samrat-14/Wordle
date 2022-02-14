@@ -15339,7 +15339,12 @@ let statsLost = 0;
 if(localStorage.getItem("statsLost")) statsLost = Number(localStorage.getItem("statsLost"));
 
 let statsBar = [0, 0, 0, 0, 0, 0];
-if(localStorage.getItem("statsBar")) statsBar = Number(localStorage.getItem("statsBar"));
+if(localStorage.getItem("statsBar")) {
+    const statsBarTemp = localStorage.getItem("statsBar");
+    for (var ind = 0; ind < statsBar.length; ind++) {
+        statsBar[ind] = Number(statsBarTemp[2 * ind]);
+    }
+}
 let statsBarMax = 0;
 if(localStorage.getItem("statsBarMax")) statsBarMax = Number(localStorage.getItem("statsBarMax"));
 
@@ -15556,6 +15561,10 @@ function checkWinLose(guess, tiles) {
             nextButton.classList.remove('disabled');
             modalCloseIcon.classList.add('hide-button');
         }, 1000);
+        targetWordsIndex += 1;
+        localStorage.setItem("targetWordsIndex", targetWordsIndex);
+        targetWord = targetWords[targetWordsIndex % targetWords.length];
+
         nextWord();
         stopInteraction();
         return;
@@ -15634,17 +15643,18 @@ function resetGrid(){
 function nextWord(){
     nextButton.addEventListener('click', () => {
         modal.classList.remove('active');
+        modalCloseIcon.classList.remove('hide-button');
+        nextButton.classList.add('disabled');
         startInteraction();
         resetGrid();
-        targetWordsIndex += 1;
-        localStorage.setItem("targetWordsIndex", targetWordsIndex);
-        targetWord = targetWords[targetWordsIndex % targetWords.length];
     }, { once: true });
 }
 
 function tryAgain(){
     tryAgainButton.addEventListener('click', () => {
         modal.classList.remove('active');
+        modalCloseIcon.classList.remove('hide-button');
+        tryAgainButton.classList.add('disabled');
         startInteraction();
         resetGrid();
     }, { once: true });
