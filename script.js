@@ -15309,6 +15309,7 @@ const helpCloseIcon = document.getElementById('help-close');
 const helpModal = document.querySelector('[data-modal-help]');
 const modalCloseIcon = document.getElementById('modal-close');
 const modal = document.querySelector('[data-modal]');
+const help = document.getElementById('help');
 const statistics = document.getElementById('statistics');
 
 const tryAgainButton = document.getElementById('try-again');
@@ -15377,7 +15378,16 @@ statistics.addEventListener('click', () => {
     stopInteraction();
 })
 
+let boardOverview = {
+    boardState : ["", "", "", "", "", ""],
+    evaluation : [null, null, null, null, null, null],
+    boardIndex : 0
+}
+
+if(localStorage.getItem("boardOverview")) boardOverview = JSON.parse(localStorage.getItem("boardOverview"));
+
 updateStats(-1);
+updateBoard();
 startInteraction();
 
 function startInteraction() {
@@ -15418,7 +15428,7 @@ function handleKeyPress(e) {
         return;
     }
 
-    if(e.key.match(/^[a-z]$/)) {
+    if(e.key.match(/^[a-z]$/i)) {
         pressKey(e.key);
         return;
     }
@@ -15454,6 +15464,8 @@ function submitGuess() {
         return word + tile.dataset.letter;
     }, "");
 
+    boardOverview.boardState[boardOverview.boardIndex] = guess;
+
     if(!dictionary.includes(guess)) {
         showAlert("Not in word list");
         shakeTiles(activeTiles);
@@ -15471,17 +15483,22 @@ function flipTile(tile, index, array, guess) {
         tile.classList.add("flip");
     }, index * FLIP_ANIMATION_DURATION / 2);
 
+    boardOverview.evaluation[boardOverview.boardIndex] = [null, null, null, null, null];
+
     tile.addEventListener('transitionend', () => {
         tile.classList.remove('flip');
         if(targetWord[index] === letter) {
             tile.dataset.state = "correct";
             key.classList.add('correct');
+            boardOverview.evaluation[boardOverview.boardIndex][index] = "correct";
         } else if(targetWord.includes(letter)) {
             tile.dataset.state = "wrong-location";
             key.classList.add('wrong-location');
+            boardOverview.evaluation[boardOverview.boardIndex][index] = "wrong-location";
         } else {
             tile.dataset.state = "wrong";
             key.classList.add('wrong');
+            boardOverview.evaluation[boardOverview.boardIndex][index] = "wrong";
         }
 
         if(index === array.length - 1) {
@@ -15533,6 +15550,9 @@ function danceTiles(tiles) {
 }
 
 function checkWinLose(guess, tiles) {
+    boardOverview.boardIndex += 1;
+    localStorage.setItem("boardOverview", JSON.stringify(boardOverview));
+
     const remainingTiles = guessGrid.querySelectorAll(':not([data-letter])');
 
     if(guess === targetWord) {
@@ -15561,10 +15581,8 @@ function checkWinLose(guess, tiles) {
             nextButton.classList.remove('disabled');
             modalCloseIcon.classList.add('hide-button');
         }, 1000);
-        targetWordsIndex += 1;
-        localStorage.setItem("targetWordsIndex", targetWordsIndex);
-        targetWord = targetWords[targetWordsIndex % targetWords.length];
 
+        resetBoard();
         nextWord();
         stopInteraction();
         return;
@@ -15582,6 +15600,8 @@ function checkWinLose(guess, tiles) {
             tryAgainButton.classList.remove('disabled');
             modalCloseIcon.classList.add('hide-button');
         }, 1000);
+
+        resetBoard();
         tryAgain();
         stopInteraction();
     }
@@ -15618,6 +15638,104 @@ function updateStats(won){
     });
 }
 
+function updateBoardPressKey(key) {
+    const nextTile = guessGrid.querySelector(':not([data-letter])');
+    nextTile.dataset.letter = key.toLowerCase();
+    nextTile.textContent = key;
+    nextTile.dataset.state = "active";
+}
+
+function updateBoard(){
+    let word;
+    for (var ind = 0; ind < boardOverview.boardIndex; ind++) {
+        word = boardOverview.boardState[ind];
+        for (var indLetter = 0; indLetter < word.length; indLetter++){
+            updateBoardPressKey(word[indLetter]);
+        }
+    }
+    updateBoardSubmitGuess(word);
+}
+
+function updateBoardSubmitGuess(word){
+    const activeTiles = [...getActiveTiles()];
+
+    activeTiles.forEach((...params) => updateBoardFlipTile(...params, word));
+}
+
+function updateBoardFlipTile(tile, index, array, guess){
+    const letter = tile.dataset.letter;
+    const key = keyboard.querySelector(`[data-key="${letter}"i]`);
+    setTimeout(() => {
+        tile.classList.add("flip");
+    }, FLIP_ANIMATION_DURATION / 2);
+
+    tile.addEventListener('transitionend', () => {
+        tile.classList.remove('flip');
+        if(targetWord[index % 5] === letter) {
+            tile.dataset.state = "correct";
+            key.classList.add('correct');
+        } else if(targetWord.includes(letter)) {
+            tile.dataset.state = "wrong-location";
+            key.classList.add('wrong-location');
+        } else {
+            tile.dataset.state = "wrong";
+            key.classList.add('wrong');
+        }
+
+        if(index === array.length - 1) {
+            array = array.splice(-5, 5);
+            tile.addEventListener('transitionend', () => {
+                updateBoardCheckWinLose(guess, array);
+            }, { once: true });
+        }
+    }, { once: true });
+}
+
+function updateBoardCheckWinLose(guess, tiles){
+    const remainingTiles = guessGrid.querySelectorAll(':not([data-letter])');
+
+    if(guess === targetWord) {
+        const comment = {
+            25 : "Excellent",
+            20 : "Brilliant",
+            15 : "Impressive",
+            10 : "Good",
+            5 : "Not Bad",
+            0 : "Phew"
+        }
+        
+        showAlert(comment[remainingTiles.length], 2000);
+
+        danceTiles(tiles);
+        setTimeout(() => {
+            modal.classList.add('active');
+            tryAgainButton.classList.add('disabled');
+            nextButton.classList.remove('disabled');
+            modalCloseIcon.classList.add('hide-button');
+        }, 1000);
+
+        resetBoard();
+        nextWord();
+        stopInteraction();
+        return;
+    }
+
+    if(remainingTiles.length === 0) {
+        showAlert("You Lose :( Better luck next time", 2000);
+        setTimeout(() => {
+            modal.classList.add('active');
+            nextButton.classList.add('disabled');
+            tryAgainButton.classList.remove('disabled');
+            modalCloseIcon.classList.add('hide-button');
+        }, 1000);
+
+        resetBoard();
+        tryAgain();
+        stopInteraction();
+    }
+
+}
+
 function resetGrid(){
     const tilesOnGrid = guessGrid.querySelectorAll('[data-state]');
     tilesOnGrid.forEach(tile => {
@@ -15640,13 +15758,27 @@ function resetGrid(){
     });
 }
 
+function resetBoard(){
+    boardOverview = {
+        boardState : ["", "", "", "", "", ""],
+        evaluation : [null, null, null, null, null, null],
+        boardIndex : 0
+    }
+}
+
 function nextWord(){
     nextButton.addEventListener('click', () => {
         modal.classList.remove('active');
         modalCloseIcon.classList.remove('hide-button');
         nextButton.classList.add('disabled');
+        
+        targetWordsIndex += 1;
+        localStorage.setItem("targetWordsIndex", targetWordsIndex);
+        targetWord = targetWords[targetWordsIndex % targetWords.length];
+
         startInteraction();
         resetGrid();
+        resetBoard();
     }, { once: true });
 }
 
@@ -15657,5 +15789,6 @@ function tryAgain(){
         tryAgainButton.classList.add('disabled');
         startInteraction();
         resetGrid();
+        resetBoard();
     }, { once: true });
 }
