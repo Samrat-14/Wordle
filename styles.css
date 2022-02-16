@@ -214,7 +214,7 @@ header{
     top: 10%;
     left: 50%;
     transform: translate(-50%);
-    z-index: 1;
+    z-index: 1000;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -247,7 +247,7 @@ header{
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 100;
     visibility: hidden;
 }
 
@@ -295,6 +295,12 @@ hr{
     height: 3.5em;
     gap: .25em;
     padding: .5em;
+}
+
+h2{
+    margin: .5rem 0 0 .5rem;
+    padding: 0;
+    letter-spacing: 3px;
 }
 
 h3{
@@ -392,6 +398,10 @@ h3{
     width: 100%;
     justify-content: end;
     font-size: 1.5rem;
+}
+
+#share{
+    border-radius: 50%;
 }
 
 #help,

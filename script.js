@@ -15314,7 +15314,9 @@ const statistics = document.getElementById('statistics');
 
 const tryAgainButton = document.getElementById('try-again');
 const nextButton = document.getElementById('next');
+const shareButton = document.getElementById('share');
 
+const statsLevel = document.getElementById('level');
 const statsPlayedSpan = document.getElementById('stats-played');
 const statsWinRateSpan = document.getElementById('stats-winrate');
 const statsCurrentStreakSpan = document.getElementById('stats-currentstreak');
@@ -15579,10 +15581,10 @@ function checkWinLose(guess, tiles) {
             modal.classList.add('active');
             tryAgainButton.classList.add('disabled');
             nextButton.classList.remove('disabled');
+            shareButton.classList.remove('disabled');
             modalCloseIcon.classList.add('hide-button');
         }, 1000);
 
-        resetBoard();
         nextWord();
         stopInteraction();
         return;
@@ -15597,11 +15599,11 @@ function checkWinLose(guess, tiles) {
         setTimeout(() => {
             modal.classList.add('active');
             nextButton.classList.add('disabled');
+            shareButton.classList.add('disabled');
             tryAgainButton.classList.remove('disabled');
             modalCloseIcon.classList.add('hide-button');
         }, 1000);
 
-        resetBoard();
         tryAgain();
         stopInteraction();
     }
@@ -15609,6 +15611,7 @@ function checkWinLose(guess, tiles) {
 }
 
 function updateStats(won){
+    statsLevel.innerText = `Wordle - ${targetWordsIndex + 1}`;
     statsWinRate = Math.floor((statsPlayed - statsLost) / statsPlayed * 100) || 0;
     if(won === 1) statsCurrentStreak += 1;
     else if(won === 0) statsCurrentStreak = 0;
@@ -15711,10 +15714,10 @@ function updateBoardCheckWinLose(guess, tiles){
             modal.classList.add('active');
             tryAgainButton.classList.add('disabled');
             nextButton.classList.remove('disabled');
+            shareButton.classList.remove('disabled');
             modalCloseIcon.classList.add('hide-button');
         }, 1000);
 
-        resetBoard();
         nextWord();
         stopInteraction();
         return;
@@ -15725,11 +15728,11 @@ function updateBoardCheckWinLose(guess, tiles){
         setTimeout(() => {
             modal.classList.add('active');
             nextButton.classList.add('disabled');
+            shareButton.classList.add('disabled');
             tryAgainButton.classList.remove('disabled');
             modalCloseIcon.classList.add('hide-button');
         }, 1000);
 
-        resetBoard();
         tryAgain();
         stopInteraction();
     }
@@ -15764,6 +15767,8 @@ function resetBoard(){
         evaluation : [null, null, null, null, null, null],
         boardIndex : 0
     }
+
+    localStorage.setItem("boardOverview", JSON.stringify(boardOverview));
 }
 
 function nextWord(){
@@ -15776,10 +15781,14 @@ function nextWord(){
         localStorage.setItem("targetWordsIndex", targetWordsIndex);
         targetWord = targetWords[targetWordsIndex % targetWords.length];
 
+        updateStats(-1);
+
         startInteraction();
         resetGrid();
         resetBoard();
     }, { once: true });
+
+    shareResult();
 }
 
 function tryAgain(){
@@ -15791,4 +15800,35 @@ function tryAgain(){
         resetGrid();
         resetBoard();
     }, { once: true });
+}
+
+function shareResult(){
+    let text = `Wordle-${targetWordsIndex + 1} `;
+    let grid = "";
+
+    let count = 0;
+    for(var row = 0; row < boardOverview.evaluation.length; row++) {
+        if(boardOverview.evaluation[row]) {
+            for(var col = 0; col < boardOverview.evaluation[row].length; col++) {
+                if(boardOverview.evaluation[row][col] === "correct") {
+                    grid += '🟩';
+                } else if(boardOverview.evaluation[row][col] === "wrong-location") {
+                    grid += '🟨';
+                } else {
+                    grid += '⬛️';
+                }
+            }
+            grid += "\n";
+            count += 1;
+        }
+    }
+
+    text += `${count}/6\n\n`;
+    text += grid;
+
+    shareButton.addEventListener('click', () => {
+        navigator.clipboard.writeText(text).then(
+            showAlert("Successfully copied to clipboard!")
+        );
+    }, { once : true })
 }
