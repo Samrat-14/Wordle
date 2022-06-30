@@ -2,6 +2,8 @@
 
 Wordle, but a better one ;)
 
+![StudyBud_screenshot](preview.png)
+
 <!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
@@ -65,4 +67,4 @@ Live Demo: [https://samrat-14.github.io/Wordle](https://samrat-14.github.io/Word
 
 ## Contact
 
-Your Name - [Samrat Sadhu](https://samrat-14.github.io/my-portfolio/) - ss2414@ece.jgec.ac.in
+[Samrat Sadhu](https://samrat-14.github.io/my-portfolio/) - ss2414@ece.jgec.ac.in
