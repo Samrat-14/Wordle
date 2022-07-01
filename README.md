@@ -2,7 +2,7 @@
 
 Wordle, but a better one ;)
 
-![StudyBud_screenshot](preview.png)
+![Wordle_screenshot](preview.png)
 
 <!-- TABLE OF CONTENTS -->
 <details>
